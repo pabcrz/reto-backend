@@ -19,6 +19,7 @@ const schema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
+    required: true,
   },
   createdAt: {
     type: Date,

@@ -6,7 +6,8 @@ const create = async (postData) => {
   return newPost;
 };
 
-const getAll = async () => await Post.find().populate("user");
+const getAll = async (search) =>
+  await Post.find({ title: new RegExp(search, "i") }).populate("user");
 
 const updateById = async (id, newPostData) => {
   const { user } = newPostData;
