@@ -1,12 +1,14 @@
-const e = require("cors");
 const jsonwebtoken = require("jsonwebtoken");
 
-const JWT_SECRET = process.env;
+const { JWT_SECRET } = process.env;
 
-const sign = (payload) =>
-  jsonwebtoken.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+function sign(payload) {
+  return jsonwebtoken.sign(payload, JWT_SECRET, { expiresIn: "1d" });
+}
 
-const verify = (token) => jsonwebtoken.verify(token, JWT_SECRET);
+function verify(token) {
+  return jsonwebtoken.verify(token, JWT_SECRET);
+}
 
 module.exports = {
   sign,

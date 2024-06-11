@@ -1,6 +1,7 @@
 const postUseCase = require("../usecases/post.usecase");
 const express = require("express");
 const auth = require("../middlewares/auth.middleware");
+const createError = require("http-errors");
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
 router.get("/", async (request, response) => {
   try {
     const posts = await postUseCase.getAll();
-    const { search } = request.query;
+
     response.json({
       success: true,
       message: "All posts",
@@ -23,14 +24,15 @@ router.get("/", async (request, response) => {
   }
 });
 
-// POST /posts
-router.post("/", async (request, response) => {
+// GET /posts/search
+router.get("/search", async (request, response) => {
   try {
-    const newPost = await postUseCase.create(request.body);
+    const post = await postUseCase.search(request.query);
+
     response.json({
       success: true,
-      message: "Post created",
-      data: { post: newPost },
+      message: "Post found",
+      data: { post },
     });
   } catch (error) {
     response.status(error.status || 500);
@@ -60,10 +62,34 @@ router.get("/:id", async (request, response) => {
   }
 });
 
+// POST /posts
+router.post("/", auth, async (request, response) => {
+  try {
+    const idUser = request.user;
+    const newPost = await postUseCase.create(request.body, idUser);
+    response.json({
+      success: true,
+      message: "Post created",
+      data: { post: newPost },
+    });
+  } catch (error) {
+    response.status(error.status || 500);
+    response.json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 // DELETE /posts/:id
-router.delete("/:id", async (request, response) => {
+router.delete("/:id", auth, async (request, response) => {
   try {
     const { id } = request.params;
+    const idUser = request.user;
+    const post = await postUseCase.getById(id);
+    if (idUser !== post.user) {
+      throw createError(403, "You don't have permission to delete this post");
+    }
     const postDeleted = await postUseCase.deleteById(id);
     response.json({
       success: true,
@@ -80,10 +106,15 @@ router.delete("/:id", async (request, response) => {
 });
 
 // PATCH /posts/:id
-router.patch("/:id", async (request, response) => {
+router.patch("/:id", auth, async (request, response) => {
   try {
     const { id } = request.params;
-    const postUpdated = await postUseCase.updateById(id);
+    const idUser = request.user;
+    const post = await postUseCase.getById(id);
+    if (idUser !== post.user) {
+      throw createError(403, "You don't have permission to update this post");
+    }
+    const postUpdated = await postUseCase.updateById(id, request.body);
     response.json({
       success: true,
       message: "Post updated",
