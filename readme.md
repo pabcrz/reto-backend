@@ -14,9 +14,9 @@ This backend project is designed as the API for DEV.to, a software development p
 
 - **For users**
 
-  - `POST /user`: Register a new user.
-  - `GET /user`: Get all users.
-  - `GET /user/:id`: Get user by id.
+  - `POST /users`: Register a new user.
+  - `GET /users`: Get all users.
+  - `GET /users/:id`: Get user by id.
   - `POST /auth/login`: Sign in with email and password.
 
 - **For posts**
