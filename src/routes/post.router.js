@@ -43,15 +43,15 @@ router.get("/search", async (request, response) => {
   }
 });
 
-// POST /posts
-router.post("/", auth, async (request, response) => {
+// GET /posts/:id
+router.get("/:id", async (request, response) => {
   try {
-    const idUser = request.user;
-    const newPost = await postUseCase.create(request.body, idUser);
+    const { id } = request.params;
+    const post = await postUseCase.getById(id);
     response.json({
       success: true,
-      message: "Post created",
-      data: { post: newPost },
+      message: "Post found",
+      data: { post },
     });
   } catch (error) {
     response.status(error.status || 500);
@@ -62,15 +62,15 @@ router.post("/", auth, async (request, response) => {
   }
 });
 
-// GET /posts/:id
-router.get("/:id", async (request, response) => {
+// POST /posts
+router.post("/", auth, async (request, response) => {
   try {
-    const { id } = request.params;
-    const post = await postUseCase.getById(id);
+    const idUser = request.user;
+    const newPost = await postUseCase.create(request.body, idUser);
     response.json({
       success: true,
-      message: "Post found",
-      data: { post },
+      message: "Post created",
+      data: { post: newPost },
     });
   } catch (error) {
     response.status(error.status || 500);
